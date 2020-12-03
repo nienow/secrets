@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pager2/db/db-helper.dart';
 import 'package:pager2/message.dart';
 import 'package:pager2/new-group.dart';
-import 'package:pager2/scanner.dart';
+import 'package:pager2/qr-connect.dart';
 
 class Contacts extends StatefulWidget {
   @override
@@ -27,30 +27,37 @@ class _ContactsState extends State<Contacts> {
     );
   }
 
-  void _newContact() {
-    Navigator.of(context).push(
+  void _newContact() async {
+    await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (BuildContext context) {
           // return QRViewExample();
           return NewGroup();
         },
       ),
-    ).then((dynamic value) {
-      if (value is bool && value) {
-        setState(() {});
-      }
-    });
+    );
+    setState(() {});
   }
 
-  Future<void> _onMenu(String value, String itemName) async {
+  Future<void> _onMenu(String value, Map<String, dynamic> item) async {
     if (value == 'delete') {
-      await dbHelper.delete(itemName);
+      await dbHelper.delete(item[DatabaseHelper.columnName]);
       setState(() {});
     } else if (value == 'message') {
-      Navigator.of(context).push(
+      await Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (BuildContext context) {
             return SecretMessage();
+          },
+        ),
+      );
+      setState(() {});
+    } else if (value == 'view') {
+      final String key = item[DatabaseHelper.columnCode] + '^' + item[DatabaseHelper.columnName];
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (BuildContext context) {
+            return GroupQr(groupKey: key);
           },
         ),
       );
@@ -71,13 +78,17 @@ class _ContactsState extends State<Contacts> {
                 title: Text(snapshot.data[i][DatabaseHelper.columnName]),
                 trailing: PopupMenuButton(
                   onSelected: (String value) {
-                    _onMenu(value, snapshot.data[i][DatabaseHelper.columnName]);
+                    _onMenu(value, snapshot.data[i]);
                   },
                   itemBuilder: (BuildContext context) {
                     return [
                       PopupMenuItem(
                         value: 'message',
                         child: Text('Message'),
+                      ),
+                      PopupMenuItem(
+                        value: 'view',
+                        child: Text('View Code'),
                       ),
                       PopupMenuItem(
                         value: 'delete',

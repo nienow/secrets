@@ -9,13 +9,12 @@ class KeyService {
 
   final storage = new FlutterSecureStorage();
 
-  String generateKey(int contactId) {
-    final key = Encrypt.Key.fromLength(32);
-    final iv = Encrypt.IV.fromLength(8);
+  String generateKey() {
+    final key = Encrypt.Key.fromSecureRandom(32);
+    final iv = Encrypt.IV.fromSecureRandom(8);
     print('key: ' + key.base64);
     print('iv: ' + iv.base64);
-    final combinedKey = key.base64 + '_' + iv.base64;
-    storage.write(key: contactId.toString(), value: combinedKey);
+    final combinedKey = key.base64 + '^' + iv.base64;
     return combinedKey;
   }
 

@@ -49,25 +49,21 @@ class _NewGroupState extends State<NewGroup> {
   }
 
   _submit() async {
-    int id = await dbHelper.insert({
-      DatabaseHelper.columnName: _nameFieldController.text
-    });
-    final key = keyService.generateKey(id);
-    await dbHelper.update({
-      DatabaseHelper.columnId: id,
-      // TODO: Encrypt code
+    final key = keyService.generateKey();
+    await dbHelper.insert({
+      DatabaseHelper.columnName: _nameFieldController.text,
       DatabaseHelper.columnCode: key
     });
     final completer = Completer();
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute<void>(
+    await Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
         builder: (BuildContext context) {
-          return new GroupQr(groupKey: key);
+          return GroupQr(groupKey: key + '^' + _nameFieldController.text);
         },
       ),
-    ).then((value) {
-      completer.complete(true);
-    });
+      result: completer.future
+    );
+    completer.complete();
   }
 
   @override

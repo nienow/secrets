@@ -1,8 +1,6 @@
 import 'dart:io';
 
-import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:pager2/service/key-service.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -15,7 +13,6 @@ class GroupQr extends StatefulWidget {
 }
 
 class _GroupQrState extends State<GroupQr> {
-  static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
   final keyService = KeyService.instance;
 
   @override
@@ -45,25 +42,5 @@ class _GroupQrState extends State<GroupQr> {
         ]
     );
   }
-  
-  // Future<void> initPlatformState() async {
-  //   try {
-  //     if (Platform.isAndroid) {
-  //       final androidData = await deviceInfoPlugin.androidInfo;
-  //       setState(() {
-  //         _deviceId = androidData.androidId;
-  //         _deviceName = androidData.manufacturer + ' ' +androidData.device;
-  //       });
-  //     } else if (Platform.isIOS) {
-  //       final isoData = await deviceInfoPlugin.iosInfo;
-  //       setState(() {
-  //         _deviceId = isoData.identifierForVendor;
-  //         _deviceName = isoData.name;
-  //       });
-  //     }
-  //   } on PlatformException {
-  //     // fail
-  //   }
-  // }
 
 }

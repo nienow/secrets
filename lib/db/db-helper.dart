@@ -11,7 +11,6 @@ class DatabaseHelper {
 
   static final table = 'contacts';
 
-  static final columnId = 'id';
   static final columnName = 'name';
   static final columnCode = 'code';
 
@@ -41,7 +40,6 @@ class DatabaseHelper {
   Future _onCreate(Database db, int version) async {
     await db.execute('''
           CREATE TABLE $table (
-            $columnId TEXT PRIMARY KEY,
             $columnName TEXT NOT NULL,
             $columnCode TEXT
           )
@@ -76,8 +74,8 @@ class DatabaseHelper {
   // column values will be used to update the row.
   Future<int> update(Map<String, dynamic> row) async {
     Database db = await instance.database;
-    int id = row[columnId];
-    return await db.update(table, row, where: '$columnId = ?', whereArgs: [id]);
+    int name = row[columnName];
+    return await db.update(table, row, where: '$columnName = ?', whereArgs: [name]);
   }
 
   // Deletes the row specified by the id. The number of affected rows is
@@ -85,5 +83,15 @@ class DatabaseHelper {
   Future<int> delete(String name) async {
     Database db = await instance.database;
     return await db.delete(table, where: '$columnName = ?', whereArgs: [name]);
+  }
+
+  Future<Map<String, dynamic>> get(String name) async {
+    Database db = await instance.database;
+    final List results = await db.query(table, where: '$columnName = ?', whereArgs: [name]);
+    if (results.isNotEmpty) {
+      return results.first;
+    } else {
+      return null;
+    }
   }
 }
