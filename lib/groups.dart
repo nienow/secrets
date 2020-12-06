@@ -1,38 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:pager2/db/db-helper.dart';
+import 'file:///C:/dev/other/pager2/lib/service/db-helper.dart';
+import 'package:pager2/manual-input.dart';
 import 'package:pager2/message.dart';
 import 'package:pager2/new-group.dart';
 import 'package:pager2/qr-connect.dart';
+import 'package:pager2/read-message.dart';
 
-class Contacts extends StatefulWidget {
+class Groups extends StatefulWidget {
   @override
-  _ContactsState createState() => _ContactsState();
+  _GroupsState createState() => _GroupsState();
 }
 
-class _ContactsState extends State<Contacts> {
+class _GroupsState extends State<Groups> {
   final dbHelper = DatabaseHelper.instance;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Contacts'),
+        title: Text('Groups'),
       ),
       body: _buildSuggestions(),
       floatingActionButton: FloatingActionButton(
-        onPressed: _newContact,
-        tooltip: 'Add Contact',
+        onPressed: _newGroup,
+        tooltip: 'Add Group',
         child: Icon(Icons.add),
       ),
     );
   }
 
-  void _newContact() async {
+  void _newGroup() async {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (BuildContext context) {
           // return QRViewExample();
           return NewGroup();
+        },
+      ),
+    );
+    setState(() {});
+  }
+
+  void _newMessage(Map<String, dynamic> item) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) {
+          return SecretMessage(groupKey: item[DatabaseHelper.columnCode]);
         },
       ),
     );
@@ -47,7 +60,7 @@ class _ContactsState extends State<Contacts> {
       await Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (BuildContext context) {
-            return SecretMessage();
+            return SecretMessage(groupKey: item[DatabaseHelper.columnCode]);
           },
         ),
       );
@@ -58,6 +71,22 @@ class _ContactsState extends State<Contacts> {
         MaterialPageRoute<void>(
           builder: (BuildContext context) {
             return GroupQr(groupKey: key);
+          },
+        ),
+      );
+    } else if (value == 'read') {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (BuildContext context) {
+            return ReadMessage(groupKey: item[DatabaseHelper.columnCode]);
+          },
+        ),
+      );
+    } else if (value == 'manual') {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (BuildContext context) {
+            return ManualInput(groupKey: item[DatabaseHelper.columnCode]);
           },
         ),
       );
@@ -76,6 +105,7 @@ class _ContactsState extends State<Contacts> {
             itemBuilder: /*1*/ (context, i) {
               return ListTile(
                 title: Text(snapshot.data[i][DatabaseHelper.columnName]),
+                onTap: () {_newMessage(snapshot.data[i]);},
                 trailing: PopupMenuButton(
                   onSelected: (String value) {
                     _onMenu(value, snapshot.data[i]);
@@ -85,6 +115,14 @@ class _ContactsState extends State<Contacts> {
                       PopupMenuItem(
                         value: 'message',
                         child: Text('Message'),
+                      ),
+                      PopupMenuItem(
+                        value: 'read',
+                        child: Text('Read QR'),
+                      ),
+                      PopupMenuItem(
+                        value: 'manual',
+                        child: Text('Read Code'),
                       ),
                       PopupMenuItem(
                         value: 'view',

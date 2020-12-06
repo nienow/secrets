@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:pager2/db/db-helper.dart';
+import 'file:///C:/dev/other/pager2/lib/service/db-helper.dart';
 import 'package:pager2/qr-connect.dart';
 import 'package:pager2/service/key-service.dart';
 

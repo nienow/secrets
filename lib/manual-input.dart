@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:pager2/qr-message.dart';
+import 'package:pager2/service/key-service.dart';
+import 'package:encrypt/encrypt.dart' as Encrypt;
 
-class SecretMessage extends StatefulWidget {
+
+class ManualInput extends StatefulWidget {
   final String groupKey;
-  SecretMessage({ Key key, this.groupKey }): super(key: key);
+  ManualInput({ Key key, this.groupKey }): super(key: key);
 
   @override
-  _SecretMessageState createState() => _SecretMessageState();
+  _ManualInputState createState() => _ManualInputState();
 }
 
-class _SecretMessageState extends State<SecretMessage> {
-  TextEditingController _messageFieldController;
+class _ManualInputState extends State<ManualInput> {
+  final keyService = KeyService.instance;
+  TextEditingController _inputFieldController;
+  String _plainText = '';
 
   void initState() {
     super.initState();
-    _messageFieldController = TextEditingController();
+    _inputFieldController = TextEditingController();
   }
 
   @override
@@ -30,7 +35,7 @@ class _SecretMessageState extends State<SecretMessage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 TextField(
-                  controller: _messageFieldController,
+                  controller: _inputFieldController,
                   maxLines: 5,
                   maxLength: 1000,
                   decoration: InputDecoration(
@@ -40,8 +45,9 @@ class _SecretMessageState extends State<SecretMessage> {
                 ),
                 RaisedButton(
                     onPressed: _submit,
-                    child: Text('Create Message')
-                )
+                    child: Text('Read Message')
+                ),
+                Text(_plainText)
               ]
           ),
         )
@@ -49,18 +55,19 @@ class _SecretMessageState extends State<SecretMessage> {
   }
 
   _submit() async {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute<void>(
-        builder: (BuildContext context) {
-          return QrMessage(message: _messageFieldController.text, groupKey: widget.groupKey);
-        },
-      ),
-    );
+    final parts = widget.groupKey.split('^');
+    final key = Encrypt.Key.fromBase64(parts[0]);
+    final iv = Encrypt.IV.fromBase64(parts[1]);
+    final encrypter = Encrypt.Encrypter(Encrypt.Salsa20(key));
+
+    setState(() {
+      _plainText = encrypter.decrypt64(_inputFieldController.text, iv: iv);
+    });
   }
 
   @override
   void dispose() {
-    _messageFieldController?.dispose();
+    _inputFieldController?.dispose();
     super.dispose();
   }
 }

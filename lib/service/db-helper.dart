@@ -1,16 +1,21 @@
 import 'dart:io';
 
+import 'package:pager2/service/key-service.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 
 class DatabaseHelper {
+  final keyService = KeyService.instance;
+  final uuid = Uuid();
 
   static final _databaseName = "Pager.db";
   static final _databaseVersion = 1;
 
   static final table = 'contacts';
 
+  static final columnId = 'id';
   static final columnName = 'name';
   static final columnCode = 'code';
 
@@ -40,10 +45,16 @@ class DatabaseHelper {
   Future _onCreate(Database db, int version) async {
     await db.execute('''
           CREATE TABLE $table (
+            $columnId TEXT PRIMARY KEY,
             $columnName TEXT NOT NULL,
             $columnCode TEXT
           )
           ''');
+    await db.insert(table, {
+      columnId: uuid.v1(),
+      columnName: 'Only Me',
+      columnCode: keyService.generateKey()
+    });
   }
 
   // Helper methods
@@ -52,6 +63,7 @@ class DatabaseHelper {
   // and the value is the column value. The return value is the id of the
   // inserted row.
   Future<int> insert(Map<String, dynamic> row) async {
+    row[columnId] = uuid.v1();
     Database db = await instance.database;
     return await db.insert(table, row);
   }

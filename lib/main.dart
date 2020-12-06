@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pager2/groups.dart';
 import 'package:pager2/home.dart';
 
 void main() {
@@ -10,7 +11,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData base = ThemeData.light();
     return MaterialApp(
-      title: 'Pager',
+      title: 'Secrets',
       theme: base.copyWith(
         primaryColor: Colors.red,
         visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -25,7 +26,9 @@ class MyApp extends StatelessWidget {
         )
       ),
       // theme: base,
-      home: HomePage(),
+      home: Home()
     );
   }
+
+
 }

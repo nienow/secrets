@@ -1,63 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:pager2/contacts.dart';
-import 'package:pager2/qr-connect.dart';
+import 'package:flutter/widgets.dart';
+import 'package:pager2/groups.dart';
+import 'package:pager2/model/group.dart';
 
-class HomePage extends StatefulWidget {
+class Home extends StatefulWidget {
   @override
-  _HomePageState createState() => _HomePageState();
+  _HomeState createState() => _HomeState();
 }
 
-class _HomePageState extends State<HomePage> {
-
-  void _seeItems() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (BuildContext context) {
-          return Contacts();
-        }, // ...to here.
-      ),
-    );
-  }
-
-  // void _showCode() {
-  //   Navigator.of(context).push(
-  //     MaterialPageRoute<void>(
-  //       builder: (BuildContext context) {
-  //         return QrCode();
-  //       }, // ...to here.
-  //     ),
-  //   );
-  // }
-
-  void _alert() {
-    // do something
-  }
-
+class _HomeState extends State<Home> {
+  int _selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Pager'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            IconButton(
-              onPressed: _alert,
-              icon: Icon(Icons.escalator_warning, color: Colors.red)
-            ),
-            RaisedButton(
-                onPressed: _seeItems,
-                child: Text('See Contacts')
-            ),
-            // RaisedButton(
-            //     onPressed: _showCode,
-            //     child: Text('Show My Code')
-            // )
-          ],
-        ),
-      ),
+      body: buildBody(),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _tapBottom,
+        items: [
+          BottomNavigationBarItem(label: 'Scan', icon: Icon(Icons.camera)),
+          BottomNavigationBarItem(label: 'Send', icon: Icon(Icons.send)),
+          BottomNavigationBarItem(label: 'Groups', icon: Icon(Icons.group))
+      ])
     );
+  }
+
+  _tapBottom(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  Widget buildBody() {
+    switch (_selectedIndex) {
+      case 0:
+      case 1:
+      case 2:
+        return Groups();
+    }
+    return Text('');
   }
 }

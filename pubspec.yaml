@@ -25,12 +25,15 @@ dependencies:
     sdk: flutter
   qr_flutter: ^3.2.0
   qr_code_scanner: ^0.0.13
-#  flutter_barcode_scanner: ^1.0.1
   sqflite: ^1.2.0
   path_provider: ^1.5.1
   device_info: ^1.0.0
   flutter_secure_storage: ^3.3.5
   encrypt: ^4.1.0
+  clipboard: ^0.1.2+8
+  screenshot: ^0.2.0
+  share: ^0.6.5+4
+  uuid: ^2.2.2
 
 dev_dependencies:
   flutter_test:
