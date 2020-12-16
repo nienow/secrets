@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pager2/groups.dart';
-import 'package:pager2/home.dart';
+import 'package:secrets/main-container.dart';
 
 void main() {
   runApp(MyApp());
@@ -26,9 +25,7 @@ class MyApp extends StatelessWidget {
         )
       ),
       // theme: base,
-      home: Home()
+      home: MainContainer()
     );
   }
-
-
 }

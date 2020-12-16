@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:pager2/qr-message.dart';
+import 'package:secrets/model/group.dart';
+import 'package:secrets/qr-message.dart';
 
 class SecretMessage extends StatefulWidget {
-  final String groupKey;
-  SecretMessage({ Key key, this.groupKey }): super(key: key);
+  final Group group;
+  SecretMessage({ Key key, this.group }): super(key: key);
 
   @override
   _SecretMessageState createState() => _SecretMessageState();
@@ -52,7 +53,7 @@ class _SecretMessageState extends State<SecretMessage> {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute<void>(
         builder: (BuildContext context) {
-          return QrMessage(message: _messageFieldController.text, groupKey: widget.groupKey);
+          return QrMessage(message: _messageFieldController.text, group: widget.group);
         },
       ),
     );

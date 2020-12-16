@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:pager2/qr-message.dart';
-import 'package:pager2/service/key-service.dart';
-import 'package:encrypt/encrypt.dart' as Encrypt;
+import 'package:secrets/model/group.dart';
+import 'package:secrets/service/db-helper.dart';
 
 
 class ManualInput extends StatefulWidget {
-  final String groupKey;
-  ManualInput({ Key key, this.groupKey }): super(key: key);
-
   @override
   _ManualInputState createState() => _ManualInputState();
 }
 
 class _ManualInputState extends State<ManualInput> {
-  final keyService = KeyService.instance;
+  final dbHelper = DatabaseHelper.instance;
   TextEditingController _inputFieldController;
   String _plainText = '';
 
@@ -55,14 +51,13 @@ class _ManualInputState extends State<ManualInput> {
   }
 
   _submit() async {
-    final parts = widget.groupKey.split('^');
-    final key = Encrypt.Key.fromBase64(parts[0]);
-    final iv = Encrypt.IV.fromBase64(parts[1]);
-    final encrypter = Encrypt.Encrypter(Encrypt.Salsa20(key));
-
-    setState(() {
-      _plainText = encrypter.decrypt64(_inputFieldController.text, iv: iv);
-    });
+    List<String> parts = _inputFieldController.text.split('^');
+    Group group = await dbHelper.get(parts.first);
+    if (group != null) {
+      setState(() {
+        _plainText = group.decrypt(parts.last);
+      });
+    }
   }
 
   @override

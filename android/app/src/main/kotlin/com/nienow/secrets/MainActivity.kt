@@ -1,4 +1,4 @@
-package com.nienow.pager2
+package com.nienow.secrets
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,21 +1,17 @@
 import 'dart:io';
-import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:encrypt/encrypt.dart' as Encrypt;
 import 'package:screenshot/screenshot.dart';
+import 'package:secrets/model/group.dart';
 import 'package:share/share.dart';
 
 class QrMessage extends StatefulWidget {
   final String message;
-  final String groupKey;
-  QrMessage({ Key key, this.message, this.groupKey }): super(key: key);
+  final Group group;
+  QrMessage({ Key key, this.message, this.group }): super(key: key);
 
   @override
   _QrMessageState createState() => _QrMessageState();
@@ -28,8 +24,7 @@ class _QrMessageState extends State<QrMessage> {
 
   void initState() {
     super.initState();
-    _encryptedMessage = getEncryptedMessage();
-    print(_encryptedMessage);
+    _encryptedMessage = widget.group.id + '^' + widget.group.encrypt(widget.message);
   }
 
   @override
@@ -67,14 +62,6 @@ class _QrMessageState extends State<QrMessage> {
 
   void _copy() {
     FlutterClipboard.copy(_encryptedMessage).then(( value ) => print('copied'));
-  }
-  
-  String getEncryptedMessage() {
-    final parts = widget.groupKey.split('^');
-    final key = Encrypt.Key.fromBase64(parts[0]);
-    final iv = Encrypt.IV.fromBase64(parts[1]);
-    final encrypter = Encrypt.Encrypter(Encrypt.Salsa20(key));
-    return encrypter.encrypt(widget.message, iv: iv).base64;
   }
 
   _captureScreenshot() {

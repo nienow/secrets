@@ -1,20 +1,17 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:pager2/service/key-service.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:secrets/model/group.dart';
 
 class GroupQr extends StatefulWidget {
-  final String groupKey;
-  GroupQr({ Key key, this.groupKey }): super(key: key);
+  final Group group;
+  GroupQr({ Key key, this.group }): super(key: key);
 
   @override
   _GroupQrState createState() => _GroupQrState();
 }
 
 class _GroupQrState extends State<GroupQr> {
-  final keyService = KeyService.instance;
-
   @override
   void initState() {
     super.initState();
@@ -35,10 +32,10 @@ class _GroupQrState extends State<GroupQr> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           QrImage(
-              data: widget.groupKey,
+              data: widget.group.getFullCode(),
               version: QrVersions.auto
           ),
-          Text(widget.groupKey)
+          Text(widget.group.getFullCode())
         ]
     );
   }

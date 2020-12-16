@@ -1,107 +1,96 @@
+
 import 'dart:io';
 
-import 'package:pager2/service/key-service.dart';
 import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:secrets/model/group.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
 
 class DatabaseHelper {
-  final keyService = KeyService.instance;
   final uuid = Uuid();
 
-  static final _databaseName = "Pager.db";
+  static final _databaseName = "secrets.db";
   static final _databaseVersion = 1;
 
-  static final table = 'contacts';
+  static final table = 'groups';
 
   static final columnId = 'id';
   static final columnName = 'name';
-  static final columnCode = 'code';
+  static final columnKey = 'key';
+  static final columnIv = 'iv';
 
-  // make this a singleton class
   DatabaseHelper._privateConstructor();
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
 
-  // only have a single app-wide reference to the database
   static Database _database;
   Future<Database> get database async {
     if (_database != null) return _database;
-    // lazily instantiate the db the first time it is accessed
     _database = await _initDatabase();
     return _database;
   }
 
-  // this opens the database (and creates it if it doesn't exist)
   _initDatabase() async {
+    print('init db');
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, _databaseName);
+    print(path);
+    // var databasesPath = await getDatabasesPath();
+    // String path = join(databasesPath, _databaseName);
+    // Delete the database
     return await openDatabase(path,
         version: _databaseVersion,
         onCreate: _onCreate);
   }
 
-  // SQL code to create the database table
   Future _onCreate(Database db, int version) async {
     await db.execute('''
           CREATE TABLE $table (
-            $columnId TEXT PRIMARY KEY,
+            $columnId TEXT NOT NULL,
             $columnName TEXT NOT NULL,
-            $columnCode TEXT
+            $columnKey TEXT NOT NULL,
+            $columnIv TEXT NOT NULL
           )
           ''');
-    await db.insert(table, {
-      columnId: uuid.v1(),
-      columnName: 'Only Me',
-      columnCode: keyService.generateKey()
+    await db.insert(table, Group.newGroup('Only Me').getValueMap());
+    print('done');
+  }
+
+  Future<int> insert(Group group) async {
+    Database db = await instance.database;
+    return await db.insert(table, group.getValueMap());
+  }
+
+  Future<List<Group>> queryAllRows() async {
+    Database db = await instance.database;
+    List<Map<String, dynamic>> results = await db.query(table);
+    List<Group> groups = List();
+    results.forEach((element) {
+      groups.add(Group.fromValueMap(element));
     });
+    return groups;
   }
 
-  // Helper methods
-
-  // Inserts a row in the database where each key in the Map is a column name
-  // and the value is the column value. The return value is the id of the
-  // inserted row.
-  Future<int> insert(Map<String, dynamic> row) async {
-    row[columnId] = uuid.v1();
-    Database db = await instance.database;
-    return await db.insert(table, row);
-  }
-
-  // All of the rows are returned as a list of maps, where each map is
-  // a key-value list of columns.
-  Future<List<Map<String, dynamic>>> queryAllRows() async {
-    Database db = await instance.database;
-    return await db.query(table);
-  }
-
-  // All of the methods (insert, query, update, delete) can also be done using
-  // raw SQL commands. This method uses a raw query to give the row count.
   Future<int> queryRowCount() async {
     Database db = await instance.database;
     return Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM $table'));
   }
 
-  // We are assuming here that the id column in the map is set. The other
-  // column values will be used to update the row.
-  Future<int> update(Map<String, dynamic> row) async {
+  Future<int> update(Group group) async {
     Database db = await instance.database;
-    int name = row[columnName];
-    return await db.update(table, row, where: '$columnName = ?', whereArgs: [name]);
+    return await db.update(table, group.getValueMap(), where: '$columnId = ?', whereArgs: [group.id]);
   }
 
-  // Deletes the row specified by the id. The number of affected rows is
-  // returned. This should be 1 as long as the row exists.
-  Future<int> delete(String name) async {
+  Future<int> delete(Group group) async {
     Database db = await instance.database;
-    return await db.delete(table, where: '$columnName = ?', whereArgs: [name]);
+    return await db.delete(table, where: '$columnId = ?', whereArgs: [group.id]);
   }
 
-  Future<Map<String, dynamic>> get(String name) async {
+  Future<Group> get(String id) async {
     Database db = await instance.database;
-    final List results = await db.query(table, where: '$columnName = ?', whereArgs: [name]);
+    final List results = await db.query(table, where: '$columnId = ?', whereArgs: [id]);
     if (results.isNotEmpty) {
-      return results.first;
+      return Group.fromValueMap(results.first);
     } else {
       return null;
     }

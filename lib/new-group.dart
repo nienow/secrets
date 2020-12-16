@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'file:///C:/dev/other/pager2/lib/service/db-helper.dart';
-import 'package:pager2/qr-connect.dart';
-import 'package:pager2/service/key-service.dart';
+import 'package:secrets/model/group.dart';
+import 'package:secrets/qr-connect.dart';
+import 'package:secrets/service/db-helper.dart';
 
 class NewGroup extends StatefulWidget {
   @override
@@ -12,7 +12,6 @@ class NewGroup extends StatefulWidget {
 
 class _NewGroupState extends State<NewGroup> {
   final dbHelper = DatabaseHelper.instance;
-  final keyService = KeyService.instance;
   TextEditingController _nameFieldController;
 
   void initState() {
@@ -49,16 +48,13 @@ class _NewGroupState extends State<NewGroup> {
   }
 
   _submit() async {
-    final key = keyService.generateKey();
-    await dbHelper.insert({
-      DatabaseHelper.columnName: _nameFieldController.text,
-      DatabaseHelper.columnCode: key
-    });
+    final group = Group.newGroup(_nameFieldController.text);
+    await dbHelper.insert(group);
     final completer = Completer();
     await Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return GroupQr(groupKey: key + '^' + _nameFieldController.text);
+          return GroupQr(group: group);
         },
       ),
       result: completer.future

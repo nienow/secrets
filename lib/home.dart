@@ -1,43 +1,85 @@
+import 'package:clipboard/clipboard.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:pager2/groups.dart';
-import 'package:pager2/model/group.dart';
+import 'package:secrets/box-button.dart';
+import 'package:secrets/display-message.dart';
+import 'package:secrets/manual-input.dart';
+import 'package:secrets/read-message.dart';
 
-class Home extends StatefulWidget {
+class HomeWidget extends StatefulWidget {
   @override
-  _HomeState createState() => _HomeState();
+  _HomeWidgetState createState() => _HomeWidgetState();
 }
 
-class _HomeState extends State<Home> {
-  int _selectedIndex = 0;
+class _HomeWidgetState extends State<HomeWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: buildBody(),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _tapBottom,
-        items: [
-          BottomNavigationBarItem(label: 'Scan', icon: Icon(Icons.camera)),
-          BottomNavigationBarItem(label: 'Send', icon: Icon(Icons.send)),
-          BottomNavigationBarItem(label: 'Groups', icon: Icon(Icons.group))
-      ])
+      appBar: AppBar(
+        title: Text('Secrets')
+      ),
+      body: Container( 
+        padding: EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: EdgeInsets.all(5.0),
+              child: Text('Read Message')
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                BoxButton(text: 'Scan QR', icon: Icons.camera, onPressed: _scan),
+                BoxButton(text: 'Paste Message', icon: Icons.paste, onPressed: _paste),
+              ],
+            ),
+            Container(
+                padding: EdgeInsets.all(5.0),
+                child: Text('Create Message')
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                BoxButton(text: 'Create QR', icon: Icons.qr_code, onPressed: _manual),
+                BoxButton(text: 'Create Text', icon: Icons.enhanced_encryption, onPressed: _paste),
+              ],
+            )
+          ]
+        )
+      )
     );
   }
 
-  _tapBottom(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+  void _scan() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) {
+          return ReadMessage();
+        },
+      ),
+    );
   }
 
-  Widget buildBody() {
-    switch (_selectedIndex) {
-      case 0:
-      case 1:
-      case 2:
-        return Groups();
-    }
-    return Text('');
+  void _manual() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) {
+          return ManualInput();
+        },
+      ),
+    );
+  }
+
+  void _paste() async {
+    String paste = await FlutterClipboard.paste();
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) {
+          return DisplayMessage(message: paste);
+        },
+      )
+    );
   }
 }

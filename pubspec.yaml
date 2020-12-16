@@ -1,5 +1,5 @@
-name: pager2
-description: A new Flutter application.
+name: secrets
+description: A QR code generator and reader that uses encrypted data, so that only you or your private groups can read them
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
@@ -34,6 +34,8 @@ dependencies:
   screenshot: ^0.2.0
   share: ^0.6.5+4
   uuid: ^2.2.2
+  contacts_service: ^0.4.6
+  url_launcher: ^5.7.10
 
 dev_dependencies:
   flutter_test:

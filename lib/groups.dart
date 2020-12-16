@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'file:///C:/dev/other/pager2/lib/service/db-helper.dart';
-import 'package:pager2/manual-input.dart';
-import 'package:pager2/message.dart';
-import 'package:pager2/new-group.dart';
-import 'package:pager2/qr-connect.dart';
-import 'package:pager2/read-message.dart';
+import 'package:secrets/message.dart';
+import 'package:secrets/model/group.dart';
+import 'package:secrets/new-group.dart';
+import 'package:secrets/qr-connect.dart';
+import 'package:secrets/service/db-helper.dart';
 
 class Groups extends StatefulWidget {
   @override
@@ -41,62 +40,65 @@ class _GroupsState extends State<Groups> {
     setState(() {});
   }
 
-  void _newMessage(Map<String, dynamic> item) async {
+  void _newMessage(Group group) async {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (BuildContext context) {
-          return SecretMessage(groupKey: item[DatabaseHelper.columnCode]);
+          return SecretMessage(group: group);
         },
       ),
     );
     setState(() {});
   }
 
-  Future<void> _onMenu(String value, Map<String, dynamic> item) async {
+  Future<void> _onMenu(String value, Group group) async {
     if (value == 'delete') {
-      await dbHelper.delete(item[DatabaseHelper.columnName]);
+      await dbHelper.delete(group);
       setState(() {});
     } else if (value == 'message') {
       await Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (BuildContext context) {
-            return SecretMessage(groupKey: item[DatabaseHelper.columnCode]);
+            return SecretMessage(group: group);
           },
         ),
       );
       setState(() {});
     } else if (value == 'view') {
-      final String key = item[DatabaseHelper.columnCode] + '^' + item[DatabaseHelper.columnName];
       await Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (BuildContext context) {
-            return GroupQr(groupKey: key);
-          },
-        ),
-      );
-    } else if (value == 'read') {
-      Navigator.of(context).push(
-        MaterialPageRoute<void>(
-          builder: (BuildContext context) {
-            return ReadMessage(groupKey: item[DatabaseHelper.columnCode]);
-          },
-        ),
-      );
-    } else if (value == 'manual') {
-      Navigator.of(context).push(
-        MaterialPageRoute<void>(
-          builder: (BuildContext context) {
-            return ManualInput(groupKey: item[DatabaseHelper.columnCode]);
+            return GroupQr(group: group);
           },
         ),
       );
     }
+    // else if (value == 'read') {
+    //   Navigator.of(context).push(
+    //     MaterialPageRoute<void>(
+    //       builder: (BuildContext context) {
+    //         return ReadMessage();
+    //       },
+    //     ),
+    //   );
+    // } else if (value == 'manual') {
+    //   Navigator.of(context).push(
+    //     MaterialPageRoute<void>(
+    //       builder: (BuildContext context) {
+    //         return ManualInput();
+    //       },
+    //     ),
+    //   );
+    // }
   }
 
   Widget _buildSuggestions() {
-    return FutureBuilder<List>(
+    return FutureBuilder<List<Group>>(
       future: dbHelper.queryAllRows(),
-      builder: (context, AsyncSnapshot<List> snapshot) {
+      builder: (context, AsyncSnapshot<List<Group>> snapshot) {
+        print(snapshot.hasData);
+        print(snapshot.error);
+        print(snapshot.data);
         if (snapshot.hasData) {
           return ListView.separated(
             separatorBuilder: (context, index) => Divider(),
@@ -104,7 +106,7 @@ class _GroupsState extends State<Groups> {
             itemCount: snapshot.data.length,
             itemBuilder: /*1*/ (context, i) {
               return ListTile(
-                title: Text(snapshot.data[i][DatabaseHelper.columnName]),
+                title: Text(snapshot.data[i].name),
                 onTap: () {_newMessage(snapshot.data[i]);},
                 trailing: PopupMenuButton(
                   onSelected: (String value) {
@@ -116,14 +118,14 @@ class _GroupsState extends State<Groups> {
                         value: 'message',
                         child: Text('Message'),
                       ),
-                      PopupMenuItem(
-                        value: 'read',
-                        child: Text('Read QR'),
-                      ),
-                      PopupMenuItem(
-                        value: 'manual',
-                        child: Text('Read Code'),
-                      ),
+                      // PopupMenuItem(
+                      //   value: 'read',
+                      //   child: Text('Read QR'),
+                      // ),
+                      // PopupMenuItem(
+                      //   value: 'manual',
+                      //   child: Text('Read Code'),
+                      // ),
                       PopupMenuItem(
                         value: 'view',
                         child: Text('View Code'),
