@@ -31,19 +31,15 @@ class DatabaseHelper {
   }
 
   _initDatabase() async {
-    print('init db');
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, _databaseName);
-    print(path);
-    // var databasesPath = await getDatabasesPath();
-    // String path = join(databasesPath, _databaseName);
-    // Delete the database
     return await openDatabase(path,
         version: _databaseVersion,
         onCreate: _onCreate);
   }
 
   Future _onCreate(Database db, int version) async {
+    // TODO: Encrypt
     await db.execute('''
           CREATE TABLE $table (
             $columnId TEXT NOT NULL,
@@ -53,7 +49,7 @@ class DatabaseHelper {
           )
           ''');
     await db.insert(table, Group.newGroup('Only Me').getValueMap());
-    print('done');
+    await db.insert(table, Group.publicGroup().getValueMap());
   }
 
   Future<int> insert(Group group) async {

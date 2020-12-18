@@ -2,6 +2,8 @@ import 'package:encrypt/encrypt.dart' as Encrypt;
 import 'package:uuid/uuid.dart';
 
 final uuid = Uuid();
+final publicKey = 'NXY4eS9CP0UoSCtNYlFlVGhXbVpxM3Q2dzl6JEMmRik=';
+final publicIV = 'YVBkU2dVa1g=';
 
 class Group {
   final String id;
@@ -25,6 +27,10 @@ class Group {
     final key = Encrypt.Key.fromSecureRandom(32);
     final iv = Encrypt.IV.fromSecureRandom(8);
     return Group._(id: id, name: name, key: key.base64, iv: iv.base64);
+  }
+
+  static publicGroup() {
+    return Group._(id: 'public', name: 'Public', key: 'NXY4eS9CP0UoSCtNYlFlVGhXbVpxM3Q2dzl6JEMmRik=', iv: 'YVBkU2dVa1g=');
   }
 
   String getFullCode() {

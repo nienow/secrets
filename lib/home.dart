@@ -26,7 +26,7 @@ class _HomeWidgetState extends State<HomeWidget> {
           children: [
             Container(
               padding: EdgeInsets.all(5.0),
-              child: Text('Read Message')
+              child: Text('Read Message', style: Theme.of(context).textTheme.headline6)
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -36,14 +36,15 @@ class _HomeWidgetState extends State<HomeWidget> {
               ],
             ),
             Container(
-                padding: EdgeInsets.all(5.0),
-                child: Text('Create Message')
+              margin: EdgeInsets.only(top: 10.0),
+              padding: EdgeInsets.all(5.0),
+              child: Text('Create Message', style: Theme.of(context).textTheme.headline6)
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 BoxButton(text: 'Create QR', icon: Icons.qr_code, onPressed: _manual),
-                BoxButton(text: 'Create Text', icon: Icons.enhanced_encryption, onPressed: _paste),
+                BoxButton(text: 'Create Text', icon: Icons.copy, onPressed: _paste),
               ],
             )
           ]

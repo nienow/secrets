@@ -18,7 +18,16 @@ class _BoxButtonState extends State<BoxButton> {
         padding: EdgeInsets.all(15.0),
         margin: EdgeInsets.all(5.0),
         decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey)
+            color: Colors.white,
+            // border: Border.all(color: Colors.grey),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 2,
+                blurRadius: 7,
+                offset: Offset(0, 3), // changes position of shadow
+              ),
+            ],
         ),
         child:  FlatButton(
           onPressed: widget.onPressed,
@@ -26,6 +35,7 @@ class _BoxButtonState extends State<BoxButton> {
           // crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Icon(widget.icon),
+              SizedBox(height: 5),
               Text(widget.text)
             ],
           )

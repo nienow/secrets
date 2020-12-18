@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:secrets/box-button.dart';
+import 'package:secrets/import-group.dart';
 import 'package:secrets/message.dart';
 import 'package:secrets/model/group.dart';
 import 'package:secrets/new-group.dart';
@@ -17,14 +19,24 @@ class _GroupsState extends State<Groups> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Groups'),
+        title: Text('Groups')
       ),
-      body: _buildSuggestions(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _newGroup,
-        tooltip: 'Add Group',
-        child: Icon(Icons.add),
+      body: Column(
+        children: [
+          Row(
+            children: [
+              BoxButton(icon: Icons.create, text: 'Create Group', onPressed: _newGroup),
+              BoxButton(icon: Icons.upload_file, text: 'Join Group', onPressed: _importGroup)
+            ]
+          ),
+          Expanded(child: _buildList())
+        ],
       ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: _newGroup,
+      //   tooltip: 'Add Group',
+      //   child: Icon(Icons.add),
+      // ),
     );
   }
 
@@ -34,6 +46,18 @@ class _GroupsState extends State<Groups> {
         builder: (BuildContext context) {
           // return QRViewExample();
           return NewGroup();
+        },
+      ),
+    );
+    setState(() {});
+  }
+
+  void _importGroup() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) {
+          // return QRViewExample();
+          return ImportGroup();
         },
       ),
     );
@@ -64,7 +88,7 @@ class _GroupsState extends State<Groups> {
         ),
       );
       setState(() {});
-    } else if (value == 'view') {
+    } else if (value == 'invite') {
       await Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (BuildContext context) {
@@ -92,7 +116,7 @@ class _GroupsState extends State<Groups> {
     // }
   }
 
-  Widget _buildSuggestions() {
+  Widget _buildList() {
     return FutureBuilder<List<Group>>(
       future: dbHelper.queryAllRows(),
       builder: (context, AsyncSnapshot<List<Group>> snapshot) {
@@ -114,21 +138,13 @@ class _GroupsState extends State<Groups> {
                   },
                   itemBuilder: (BuildContext context) {
                     return [
-                      PopupMenuItem(
-                        value: 'message',
-                        child: Text('Message'),
-                      ),
                       // PopupMenuItem(
-                      //   value: 'read',
-                      //   child: Text('Read QR'),
-                      // ),
-                      // PopupMenuItem(
-                      //   value: 'manual',
-                      //   child: Text('Read Code'),
+                      //   value: 'message',
+                      //   child: Text('Message'),
                       // ),
                       PopupMenuItem(
-                        value: 'view',
-                        child: Text('View Code'),
+                        value: 'invite',
+                        child: Text('Invite'),
                       ),
                       PopupMenuItem(
                         value: 'delete',
